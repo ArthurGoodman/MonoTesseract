@@ -29,6 +29,8 @@ namespace MonoTesseract {
         Vector2 windowedResolution;
         Vector2 fullscreenResolution;
 
+        float scaleFactor = 2.0f;
+
         public Game() {
             graphics = new GraphicsDeviceManager(this);
             
@@ -59,7 +61,7 @@ namespace MonoTesseract {
             var cameraUpVector = Vector3.UnitY;
 
             effect.View = Matrix.CreateLookAt(cameraPosition, cameraLookAtVector, cameraUpVector);
-            effect.World = Matrix.Multiply(effect.World, Matrix.CreateScale(2));
+            effect.World = Matrix.Multiply(effect.World, Matrix.CreateScale(scaleFactor));
 
             actualVertices = new Vector4[16];
 
@@ -206,12 +208,13 @@ namespace MonoTesseract {
 
             if (mouseState != prevMouseState) {
                 int delta = mouseState.ScrollWheelValue - prevMouseState.ScrollWheelValue;
-                float scaleFactor = delta > 0 ? 1.1f : delta < 0 ? 1.0f / 1.1f : 1.0f;
+                float factor = delta > 0 ? 1.1f : delta < 0 ? 1.0f / 1.1f : 1.0f;
 
-                effect.World = Matrix.Multiply(effect.World, Matrix.CreateScale(scaleFactor));
+                scaleFactor *= factor;
+                effect.World = Matrix.Multiply(effect.World, Matrix.CreateScale(factor));
 
-                double deltaX = (mouseState.Position.X - prevMouseState.Position.X) / 100.0f;
-                double deltaY = -(mouseState.Position.Y - prevMouseState.Position.Y) / 100.0f;
+                double deltaX = (mouseState.Position.X - prevMouseState.Position.X) / 50.0f / scaleFactor;
+                double deltaY = -(mouseState.Position.Y - prevMouseState.Position.Y) / 50.0f / scaleFactor;
 
                 Matrix matrix = Matrix.Identity;
 
